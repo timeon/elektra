@@ -45,6 +45,12 @@
 //= require jquery.cookie.min
 //= require flash
 
+
+
+//= require searchable_list/test
+
+
+
 <%
 Core::PluginsManager.plugins_with_global_js.each do |plugin|
   require_asset("#{plugin.name}/#{plugin.class::GLOBAL_JS_FILE_NAME}")

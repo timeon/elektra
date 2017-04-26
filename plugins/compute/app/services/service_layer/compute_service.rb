@@ -37,6 +37,10 @@ module ServiceLayer
       driver.map_to(Compute::Server).servers(filter)
     end
 
+    def servers_without_details(filter={})
+      driver.map_to(Compute::Server).servers_without_details(filter)
+    end
+
     def usage(filter = {})
       driver.map_to(Compute::Usage).usage(filter)
     end

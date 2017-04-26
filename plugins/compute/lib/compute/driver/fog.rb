@@ -13,6 +13,10 @@ module Compute
         handle_response { @fog.list_servers_detail(filter).body['servers'] }
       end
 
+      def servers_without_details(filter={})
+        handle_response { @fog.list_servers(filter).body['servers'] }
+      end
+
       def create_server(params={})
         name = params.delete("name")
         image_ref = params.delete("imageRef")
