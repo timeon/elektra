@@ -7,7 +7,7 @@ module Compute
     authorization_required except: [:new_floatingip, :attach_floatingip, :detach_floatingip]
 
     def index
-      params[:per_page] =1
+      params[:per_page] =5
       @instances = []
       if @scoped_project_id
         @instances = paginatable(per_page: (params[:per_page] || 10).to_i) do |pagination_options|
@@ -25,6 +25,16 @@ module Compute
           ])
         end
       end
+
+      # add permissions to each instance
+      @instances.each do |instance|
+        instance.permissions={
+          can_read: current_user.is_allowed?("compute:instance_get", {}),
+          can_delete: current_user.is_allowed?("compute:instance_delete", {target: { project: @active_project, scoped_domain_name: @scoped_domain_name}}),
+          can_update: current_user.is_allowed?("compute:instance_update", {target: { project: @active_project, scoped_domain_name: @scoped_domain_name}})
+        }
+      end
+
       respond_to do |format|
         format.html {}
         format.json {render json: @instances }

@@ -5,6 +5,7 @@
 #= require searchable_list/components/header
 #= require searchable_list/components/body
 #= require searchable_list/components/footer
+#= require react/helpers
 
 { div } = React.DOM
 { createStore, applyMiddleware, compose, combineReducers } = Redux
@@ -32,16 +33,17 @@ SearchableList.Wrapper = (options = {}) ->
     componentWillMount: ->
       # load items into state bevore rendering
       store.dispatch(setInitialItems(@props.name,@props.items)) if @props.items
-      store.dispatch(setUrl(@props.name,@props.url)) if @props.url
+      store.dispatch(setUrl(@props.name,@props.search_url)) if @props.search_url
       store.dispatch(setHasNext(@props.name,@props.has_next)) if @props.has_next
 
     render: ->
+      newProps = ReactHelpers.mergeObjects({},@props,{ listName: @props.name})
       React.createElement Provider, store: store,
         div null,
           # render header
-          React.createElement Header(options['header']), listName: @props.name
+          React.createElement Header(options['header']), newProps
           # render body with wrapped component
-          React.createElement Body(options['body']), listName: @props.name, searchFields: @props.searchFields
+          React.createElement Body(options['body']), newProps
           # render footer which contains the load next button
           React.createElement Footer, listName: @props.name
 

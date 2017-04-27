@@ -5,6 +5,12 @@ class @ReactAjaxHelper
       l = window.location
       @rootUrl = "#{l.protocol}//#{l.host}/#{l.pathname}"
 
+  @buildUrl: (root,path) ->
+    if path.indexOf('http')>-1
+      return path
+    else
+      return root+path
+
   @request: (url, method, options={}) ->
     url = url.replace(/([^:]\/)\/+/g, "$1")
     $.ajax
@@ -24,7 +30,7 @@ class @ReactAjaxHelper
         else
           options['complete'](jqXHR, textStatus) if options["complete"]
 
-  get: (path,options={}) -> ReactAjaxHelper.request(@rootUrl+path,'GET',options)
-  post: (path,options={}) -> ReactAjaxHelper.request(@rootUrl+path,'POST',options)
-  put: (path,options={}) -> ReactAjaxHelper.request(@rootUrl+path,'PUT',options)
-  delete: (path,options={}) -> ReactAjaxHelper.request(@rootUrl+path,'DELETE',options)
+  get: (path,options={}) -> ReactAjaxHelper.request(ReactAjaxHelper.buildUrl(@rootUrl,path),'GET',options)
+  post: (path,options={}) -> ReactAjaxHelper.request(ReactAjaxHelper.buildUrl(@rootUrl,path),'POST',options)
+  put: (path,options={}) -> ReactAjaxHelper.request(ReactAjaxHelper.buildUrl(@rootUrl,path),'PUT',options)
+  delete: (path,options={}) -> ReactAjaxHelper.request(ReactAjaxHelper.buildUrl(@rootUrl,path),'DELETE',options)

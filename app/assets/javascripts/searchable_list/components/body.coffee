@@ -3,7 +3,9 @@
 
 # body wrapper
 Body = (WrappedComponent, options = {}) ->
-  Content = ({listName, items, searchFields, lastReceivedAt, searchTerm}) ->
+  Content = (props) ->
+    {listName, items, searchFields, lastReceivedAt, searchTerm} = props
+
     values= (item) ->
       result = []
       (result.push(item[key]) if item[key]) for key in searchFields
@@ -19,8 +21,10 @@ Body = (WrappedComponent, options = {}) ->
       return null unless items
       items.filter(searchFilter)
 
+    newProps = ReactHelpers.mergeObjects({},props,{ items: relevantItems()})
+
     div null,
-      React.createElement WrappedComponent, listName: listName, items: relevantItems()
+      React.createElement WrappedComponent, newProps
 
   # connect body to store
   Content = connect(

@@ -1,6 +1,14 @@
 = render "intro"
 
-= react_component 'TestList', items: @instances, name: 'instances', searchFields: ['name'], has_next: @pagination_has_next
+= react_component 'compute.Instances',
+  items: @instances,
+  search_url: plugin('compute').instances_url,
+  name: 'instances',
+  searchFields: ['name'],
+  has_next: @pagination_has_next,
+  permissions: {can_create: current_user.is_allowed?("compute:instance_create", {target: { project: @active_project, scoped_domain_name: @scoped_domain_name}}) },
+  root_url: plugin('compute').instances_url,
+  all_projects: @all_projects
 
 -# - if @scoped_project_id
 -#   .toolbar

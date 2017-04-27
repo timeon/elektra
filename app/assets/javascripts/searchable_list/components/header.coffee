@@ -3,7 +3,9 @@
 { handleSubmit, loadNextItems, updateSearchTerm } = SearchableList
 
 Header = (WrappedComponent, options = {}) ->
-  Content = ({items, fields, isFetching, lastReceivedAt,updateSearchTerm}) ->
+  Content = (props) ->
+    {items, fields, isFetching, lastReceivedAt,setSearchTerm} = props
+
     div className: 'toolbar',
       # if errors
       #   div className: 'alert alert-error', React.createElement ReactFormHelpers.Errors, errors: errors
@@ -15,13 +17,13 @@ Header = (WrappedComponent, options = {}) ->
             type: "text",
             className: "form-control string search-term",
             placeholder: "Search for...",
-            onChange: ((e) -> e.preventDefault(); updateSearchTerm(e.target.value.trim());)
+            onChange: ((e) -> e.preventDefault(); setSearchTerm(e.target.value.trim());)
           span className: "input-group-addon",
             i className: 'fa fa-search'
           # span className: "input-group-btn",
           #   button className: "btn btn-primary", type: "submit", onClick: ((e) -> e.preventDefault(); handleSubmit()), "Go!"
 
-      React.createElement WrappedComponent if WrappedComponent
+      React.createElement WrappedComponent, props if WrappedComponent
 
   Content= connect(
     (state, ownProps) ->
@@ -32,7 +34,7 @@ Header = (WrappedComponent, options = {}) ->
     (dispatch,ownProps) ->
       listName = ownProps.listName
       handleSubmit: -> dispatch(fetchNextItems(listName))
-      updateSearchTerm: (searchTerm) -> dispatch(updateSearchTerm(listName,searchTerm))
+      setSearchTerm: (searchTerm) -> dispatch(updateSearchTerm(listName,searchTerm))
       loadNextItems: -> dispatch(fetchNextItems(listName))
   )(Content)
 
