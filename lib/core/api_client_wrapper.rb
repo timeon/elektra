@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require_relative 'api_error'
+
 module Core
   # Wrapper for Api Client
   class ApiClientWrapper
@@ -88,8 +90,7 @@ module Core
       def handle_response
         response = yield
         unless response.is_a?(Net::HTTPOK)
-          raise ::Core::ServiceLayer::Errors::ApiError,
-                "API ERROR: #{response.body}"
+          raise ::Core::ApiError, response
         end
         ApiClientWrapper::Response.new(response)
       end
