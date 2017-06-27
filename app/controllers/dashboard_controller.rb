@@ -303,19 +303,23 @@ class DashboardController < ::ScopeController
   end
 
   def set_user_api_client
-    misty_cloud ||= ::Misty::Cloud.new(
-      auth:            {
-        url:            current_user.service_url('identity', {region: current_region, interface: 'public'}),
-        token:          current_user.token,
-        domain_id:      current_user.domain_id,
-        project_id:     current_user.project_id,
-        user_domain_id: current_user.user_domain_id,
+
+    misty_auth_params = {
+      context: { 
+            catalog: current_user.context["catalog"],
+            expires: current_user.context["expires_at"],
+            token: current_user.token
       },
+      domain_id:      current_user.domain_id,
+      project_id:     current_user.project_id,
+      user_domain_id: current_user.user_domain_id,
+    }
+
+    misty_cloud ||= ::Misty::Cloud.new(
+      auth:           misty_auth_params,
       region_id:       current_region,
       ssl_verify_mode: Rails.configuration.ssl_verify_peer,
-      http_proxy:      ENV['http_proxy'],
-
-      log_level: Logger::INFO,
+      log_level:       Logger::INFO,
 
       # needed because of wrong urls in service catalog.
       # The identity url contains a /v3. This leads to a wrong url in misty!
@@ -323,6 +327,5 @@ class DashboardController < ::ScopeController
     )
     register_default_api_client(misty_cloud)
 
-    #byebug
   end
 end
