@@ -3,6 +3,7 @@ require_relative '../strip_attributes'
 module Core
   module ServiceLayer
     class ModelNG
+      include Core::ApiClientAccessor
       extend ActiveModel::Naming
       extend ActiveModel::Translation
       include ActiveModel::Conversion
