@@ -8,6 +8,9 @@ require_relative 'core/errors'
 require_relative 'core/paginatable'
 require_relative 'core/strip_attributes'
 
+require_relative 'core/api_client_accessor'
+require_relative 'core/api_client_wrapper'
+
 module Core
   def self.locate_region(auth_user,default_region=Rails.configuration.default_region)
     if default_region.nil?

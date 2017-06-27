@@ -324,5 +324,6 @@ class DashboardController < ::ScopeController
     register_default_api_client(misty_cloud)
 
     #byebug
+    Identity::User.new(nil).test
   end
 end
