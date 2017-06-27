@@ -28,6 +28,10 @@ module Core
       end
 
       def api
+        self.class.api
+      end
+      
+      def self.api
         @api ||= Core::ApiClientWrapper.new(api_client)
       end
 
@@ -245,14 +249,6 @@ module Core
 
       def self.debug(message)
         puts message if ENV['MODEL_DEBUG']
-      end
-
-      def self.prepare_filter(query)
-        return Excon::Utils.query_string(query: query).sub(/^\?/, '')
-      end
-
-      def prepare_filter(*args)
-        self.class.prepare_filter(*args)
       end
 
     end
