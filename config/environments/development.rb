@@ -57,6 +57,15 @@ Rails.application.configure do
 
   puts "=> Auth Endpoint #{ENV['MONSOON_OPENSTACK_AUTH_API_ENDPOINT']}" if ENV['MONSOON_OPENSTACK_AUTH_API_ENDPOINT']
 
+  if ENV['MODEL_DEBUG']
+    puts "=> Debug model #{ENV['MODEL_DEBUG']}"
+  end
+
+  if ENV['API_DEBUG']
+    puts "=> Debug API #{ENV['API_DEBUG']}"
+  end
+
+
   # config.exceptions_app = ->(env) { ErrorsController.action(:show).call(env) }
   # config.log_tags = [ :uuid ]
   # config.middleware.use "TaggedExceptionsMiddleware"
