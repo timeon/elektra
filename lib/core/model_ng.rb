@@ -1,4 +1,4 @@
-require_relative '../strip_attributes'
+require_relative 'strip_attributes'
 
 module Core
   class ModelNG
