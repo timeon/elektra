@@ -1,7 +1,5 @@
 module Identity
   class User < Core::ServiceLayer::Model
-    include Core::ApiClientAccessor
-
     validates :description, presence: true
 
     def full_name
@@ -23,6 +21,5 @@ module Identity
     def attributes_for_update
       attributes_for_create
     end
-
   end
 end
