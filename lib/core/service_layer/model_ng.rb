@@ -243,6 +243,14 @@ module Core
         puts message if ENV['MODEL_DEBUG']
       end
 
+      def self.prepare_filter(query)
+        return Excon::Utils.query_string(query: query).sub(/^\?/, '')
+      end
+
+      def prepare_filter(*args)
+        self.class.prepare_filter(*args)
+      end
+
     end
   end
 end
