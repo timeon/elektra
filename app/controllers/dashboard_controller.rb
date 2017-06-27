@@ -304,6 +304,8 @@ class DashboardController < ::ScopeController
 
   def set_user_api_client
 
+    puts "[dashboard controller] -> api_client" if ENV['API_DEBUG']
+
     misty_auth_params = {
       context: { 
             catalog: current_user.context["catalog"],
