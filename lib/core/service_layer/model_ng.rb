@@ -27,6 +27,10 @@ module Core
         after_initialize
       end
 
+      def api
+        @api ||= Core::ApiClientWrapper.new(api_client)
+      end
+
       def id
         @id
       end
