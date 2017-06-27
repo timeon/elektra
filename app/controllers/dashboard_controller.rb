@@ -2,6 +2,7 @@
 # All subclasses which require a logged in user should inherit from this class.
 class DashboardController < ::ScopeController
   include UrlHelper
+  include ::Core::ApiClientAccessor
 
   prepend_before_filter do
     # session[:monsoon_openstack_auth_token]["expires_at"]=(Time.now-1.minute).to_s
@@ -38,6 +39,8 @@ class DashboardController < ::ScopeController
   # rescope token
   before_filter :rescope_token, except: [:terms_of_use]
   before_filter :raven_context, except: [:terms_of_use]
+
+  before_filter :set_user_api_client
   before_filter :load_user_projects, except: [:terms_of_use]
   before_filter :set_mailer_host
 
@@ -297,5 +300,29 @@ class DashboardController < ::ScopeController
       end
 
     end
+  end
+
+  def set_user_api_client
+    misty_cloud ||= ::Misty::Cloud.new(
+      auth:            {
+        url:            current_user.service_url('identity', {region: current_region, interface: 'public'}),
+        token:          current_user.token,
+        domain_id:      current_user.domain_id,
+        project_id:     current_user.project_id,
+        user_domain_id: current_user.user_domain_id,
+      },
+      region_id:       current_region,
+      ssl_verify_mode: Rails.configuration.ssl_verify_peer,
+      http_proxy:      ENV['http_proxy'],
+
+      log_level: Logger::INFO,
+
+      # needed because of wrong urls in service catalog.
+      # The identity url contains a /v3. This leads to a wrong url in misty!
+      identity: { base_path: '/' }
+    )
+    register_default_api_client(misty_cloud)
+
+    #byebug
   end
 end

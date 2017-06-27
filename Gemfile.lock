@@ -454,6 +454,7 @@ GEM
       railties (>= 3.2)
       tilt
     redcarpet (3.3.4)
+    request_store (1.3.2)
     responders (2.1.0)
       railties (>= 4.2.0, < 5)
     rest-client (2.0.0)
@@ -601,6 +602,7 @@ DEPENDENCIES
   rails_stdout_logging
   react-rails
   redcarpet
+  request_store
   resource_management!
   responders
   rspec

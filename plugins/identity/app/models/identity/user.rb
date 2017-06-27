@@ -1,11 +1,13 @@
 module Identity
   class User < Core::ServiceLayer::Model
+    include Core::ApiClientAccessor
+
     validates :description, presence: true
-    
+
     def full_name
       (description.nil? or description.empty?) ? name : description
     end
-    
+
     def attributes_for_create
       {
         "name"                => read("name"),
@@ -21,5 +23,6 @@ module Identity
     def attributes_for_update
       attributes_for_create
     end
+
   end
 end
