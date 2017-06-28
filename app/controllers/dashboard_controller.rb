@@ -317,8 +317,10 @@ class DashboardController < ::ScopeController
 
       # needed because of wrong urls in service catalog.
       # The identity url contains a /v3. This leads to a wrong url in misty!
-      identity: { base_path: '/' }
+      identity: { base_path: '/' },
     }
     register_default_api_client(::Misty::Cloud.new(client_params))
+
+    #Identity::UserNg.new.test
   end
 end

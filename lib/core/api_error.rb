@@ -3,15 +3,23 @@
 module Core
   # Wrapper for API errors
   class ApiError < StandardError
-    attr_reader :response
+    attr_reader :response, :messages, :code, :code_type, :error_type
 
     def initialize(response)
-      @response = response || {}
-      data = @response.respond_to?(:body) ? @response.body : @response
-      data = JSON.parse(data) unless data.is_a?(Hash)
+      if response
+        @code = response.code
+        @code_type = code_type
+        @error_type = error_type
 
-      messages = ApiError.read_error_messages(data)
-      super(messages.join(', '))
+        @response = response
+        data = @response.respond_to?(:body) ? @response.body : @response
+        data = JSON.parse(data) unless data.is_a?(Hash)
+
+        @messages = ApiError.read_error_messages(data)
+        super(@messages.join(', '))
+      else
+        super(response)
+      end
     end
 
     def self.read_error_messages(hash,messages=[])
