@@ -52,7 +52,6 @@ module Core
         api_client.send(name).requests.each do |meth|
           (class << self; self; end).class_eval do
             define_method meth do |*args|
-              args = prepare_params(*args)
               handle_response do
                 api_client.send(name).send(meth, *args)
               end
@@ -63,33 +62,6 @@ module Core
 
       def requests
         api_client.send(name).requests
-      end
-
-      # convert hashes and array to url params
-      def prepare_params( *args )
-        # convert arguments to url params
-        args.collect do |arg|
-          if arg.is_a?(Array)
-            # argument is an array -> join values by &
-            arg.join('&')
-          elsif arg.is_a?(Hash)
-            # arg is an hash -> check if values are plane values
-            # select values which are hashes
-            data = arg.select { |_k, v| v.is_a?(Array) || v.is_a?(Hash) }
-            if data.size.positive?
-              # argument contains values which represents data -> do not
-              # convert them tu url params.
-              arg.to_json
-            else
-              # argument is a hash with plain values -> join keys and values
-              # by k=v&
-              arg.to_a.collect { |a| "#{a[0]}=#{a[1]}" }.join('&')
-            end
-          else
-            # argument is a string or number
-            arg.to_s
-          end
-        end
       end
 
       # Check for response errors
@@ -110,7 +82,7 @@ module Core
         data
       end
     end
-    
+
     # create class methods for each service.
     # identity, compute, networking ....
     Misty.services.collect(&:name).each do |name|
