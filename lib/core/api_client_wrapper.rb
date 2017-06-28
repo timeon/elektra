@@ -5,17 +5,6 @@ require_relative 'api_error'
 module Core
   # Wrapper for Api Client
   class ApiClientWrapper
-    # This method is used to map raw data to a Object.
-    def self.map_to(klazz, data, options = {})
-      if data.is_a?(Array)
-        data.collect { |item| klazz.new(item.merge(options)) }
-      elsif data.is_a?(Hash)
-        klazz.new(data.merge(options))
-      else
-        data
-      end
-    end
-
     # Wrapper for misty services
     class Service
       include ::Core::ApiClientAccessor
@@ -111,6 +100,17 @@ module Core
       end
     end
 
+    # This method is used to map raw data to a Object.
+    def self.map_to(klazz, data, options = {})
+      if data.is_a?(Array)
+        data.collect { |item| klazz.new(item.merge(options)) }
+      elsif data.is_a?(Hash)
+        klazz.new(data.merge(options))
+      else
+        data
+      end
+    end
+    
     # create class methods for each service.
     # identity, compute, networking ....
     Misty.services.collect(&:name).each do |name|
