@@ -6,7 +6,6 @@ module Core
   # This class implements the basic functionality for api models.
   # The API response is mapped to a subclass of this class.
   class ModelNG
-    include Core::ApiClientAccessor
     extend ActiveModel::Naming
     extend ActiveModel::Translation
     include ActiveModel::Conversion
@@ -32,13 +31,11 @@ module Core
 
     # wrap api client
     def api
-      # @api ||= Core::ApiClientWrapper.new(api_client)
       Core::ApiClientWrapper
     end
 
     # wrap class api client
     def self.api
-      #Core::ApiClientWrapper.new(api_client)
       Core::ApiClientWrapper
     end
 
