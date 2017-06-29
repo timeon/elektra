@@ -50,14 +50,13 @@ module Core
     # look in attributes if a method is missing
     def method_missing(method_sym, *arguments, &block)
       attribute_name = method_sym.to_s
-      attribute_name = attribute_name.chop if attribute_name.ends_with?('=')
-
-      if arguments.count > 1
+      if attribute_name.ends_with?('=')
+        attribute_name = attribute_name.chop
         write(attribute_name, arguments)
-      elsif arguments.count.positive?
-        write(attribute_name, arguments.first)
-      else
+      elsif attribute_name.length > 2
         read(attribute_name)
+      else
+        super
       end
     end
 

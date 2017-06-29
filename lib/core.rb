@@ -10,6 +10,7 @@ require_relative 'core/strip_attributes'
 
 require_relative 'core/api_client_accessor'
 require_relative 'core/api_client_wrapper'
+require_relative 'core/service_user_api_client_manager'
 
 module Core
   def self.locate_region(auth_user,default_region=Rails.configuration.default_region)

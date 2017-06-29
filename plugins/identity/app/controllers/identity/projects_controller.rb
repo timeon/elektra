@@ -1,7 +1,11 @@
+# frozen_string_literal: true
+
 module Identity
+  # Implements project actions
   class ProjectsController < ::DashboardController
-    before_filter :project_id_required, except: [:index, :create, :new, :user_projects]
-    before_filter :get_project_id,  except: [:index, :create, :new]
+    before_filter :project_id_required, except: %i[index create
+                                                   new user_projects]
+    before_filter :get_project_id,  except: %i[index create new]
 
     # check wizard state and redirect unless finished
     before_filter :check_wizard_status, only: [:show]
@@ -10,26 +14,30 @@ module Identity
       @scoped_project_fid = params[:project_id] || @project_id
     end
 
-    authorization_required(context:'identity', additional_policy_params: {project: Proc.new { {id: @project_id, domain_id: @scoped_domain_id} } } )
+    authorization_required(
+      context: 'identity',
+      additional_policy_params: {
+        project: proc { { id: @project_id, domain_id: @scoped_domain_id } }
+      }
+    )
 
     def user_projects
-      @projects = @user_domain_projects.collect{ |project| ::Identity::Project.new(@driver, project.attributes.merge(id:project.id)) }
+      @projects = @user_domain_projects
 
       respond_to do |format|
-        format.html {
+        format.html do
           if params[:partial]
-            render partial: 'projects', locals: {projects: @projects, remote_links: true}, layout: false
+            render partial: 'projects', locals: { projects: @projects,
+                                                  remote_links: true }, layout: false
           else
             render action: :index
           end
-        }
+        end
         format.js
       end
-
     end
 
-    def show
-    end
+    def show; end
 
     def view
       @project = services.identity.find_project(@project_id, [:subtree_as_ids, :parents_as_ids])
@@ -41,26 +49,31 @@ module Identity
     end
 
     def edit
-      @project = services.identity.find_project(@project_id)
+      #@project = services.identity.find_project(@project_id)
+      @project = Identity::ProjectNg.find(@project_id)
     end
 
     def update
-      params[:project][:enabled] = (params[:project][:enabled]==true or params[:project][:enabled]=='true') ? true : false
-      @project = services.identity.find_project(@project_id)
-      @project.attributes = params[:project]
+      params[:project_ng][:enabled] = (params[:project_ng][:enabled]==true or params[:project_ng][:enabled]=='true') ? true : false
+      @project = Identity::ProjectNg.new(params[:project_ng])
+      @project.id = params[:id]
+      #@project = services.identity.find_project(@project_id)
+      #@project.attributes = params[:project_ng]
       @project.domain_id=@scoped_domain_id
 
-      if @project.valid? && service_user.update_project(@project_id,@project.attributes)
-        # audit_logger.info("User #{current_user.name} (#{current_user.id}) has updated project #{@project.name} (#{@project.id})")
-        # audit_logger.info(user: current_user, has: "updated", project: @project)
-        audit_logger.info(current_user, "has updated", @project)
+      domain_admin do
+        if @project.valid? && @project.save
+          # audit_logger.info("User #{current_user.name} (#{current_user.id}) has updated project #{@project.name} (#{@project.id})")
+          # audit_logger.info(user: current_user, has: "updated", project: @project)
+          audit_logger.info(current_user, "has updated", @project)
 
-        entry = FriendlyIdEntry.update_project_entry(@project)
-        flash[:notice] = "Project #{@project.name} successfully updated."
-        redirect_to plugin('identity').project_path(project_id: (entry.nil? ? @project.id : entry.slug))
-      else
-        flash.now[:error] = @project.errors.full_messages.to_sentence
-        render action: :edit
+          entry = FriendlyIdEntry.update_project_entry(@project)
+          flash[:notice] = "Project #{@project.name} successfully updated."
+          redirect_to plugin('identity').project_path(project_id: (entry.nil? ? @project.id : entry.slug))
+        else
+          flash.now[:error] = @project.errors.full_messages.to_sentence
+          render action: :edit
+        end
       end
     end
 

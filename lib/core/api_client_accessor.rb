@@ -42,8 +42,9 @@ module Core
 
       last_client = current_api_client
       self.current_api_client = api_client_registry[name]
-      yield if block_given?
+      result = yield if block_given?
       self.current_api_client = last_client
+      result
     end
 
     def self.included(base)
@@ -53,6 +54,10 @@ module Core
 
     # Instance methods which are included in the base class.
     module InstanceMethods
+      def all_api_clients
+        ApiClientAccessor.api_client_registry
+      end
+
       # register user client
       def register_default_api_client(api_client)
         ApiClientAccessor.register_api_client('default', api_client)

@@ -94,7 +94,7 @@ module MonsoonDashboard
     puts "=> SSL verify: #{config.ssl_verify_peer}"
 
     ############## REGION ###############
-    config.default_region = ENV['MONSOON_DASHBOARD_REGION'] || ['eu-de-1','staging','europe']
+    config.default_region = ENV['MONSOON_DASHBOARD_REGION']
 
     ############## CLOUD ADMIN ###############
     config.cloud_admin_domain = ENV.fetch('MONSOON_OPENSTACK_CLOUDADMIN_DOMAIN', 'ccadmin')

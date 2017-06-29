@@ -1,13 +1,10 @@
+# frozen_string_literal: true
+
 module Identity
+  # This class represents the user
   class UserNg < Core::ModelNG
-    def test
-      byebug
-      begin
-        api.compute.list_images
-        api.identity.show_user_details('d799b4c2b43df2192ee6c4437879523d857e0220977ed8674056b504dbafc884').map_to(self.class)
-      rescue => e
-        p e.message
-      end
+    def self.group_users(group_id, filter = {})
+      api.identity.list_users_in_group(group_id, filter).map_to(self)
     end
   end
 end
