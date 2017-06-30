@@ -54,15 +54,16 @@ module Identity
     end
 
     def update
+      byebug
       params[:project_ng][:enabled] = (params[:project_ng][:enabled]==true or params[:project_ng][:enabled]=='true') ? true : false
       @project = Identity::ProjectNg.new(params[:project_ng])
-      @project.id = params[:id]
+      @project.id = @project_id
       #@project = services.identity.find_project(@project_id)
       #@project.attributes = params[:project_ng]
-      @project.domain_id=@scoped_domain_id
+      @project.domain_id = @scoped_domain_id
 
       domain_admin do
-        if @project.valid? && @project.save
+        if @project.save
           # audit_logger.info("User #{current_user.name} (#{current_user.id}) has updated project #{@project.name} (#{@project.id})")
           # audit_logger.info(user: current_user, has: "updated", project: @project)
           audit_logger.info(current_user, "has updated", @project)

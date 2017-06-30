@@ -36,8 +36,6 @@ class DashboardController < ::ScopeController
     two_factor: :two_factor_required?,
     except: :terms_of_use
   )
-  # user is authenticated -> register api_client for current user
-  before_action :set_user_api_client
 
   # after_login is used by monsoon_openstack_auth gem.
   # After the authentication process has finished the
@@ -49,6 +47,9 @@ class DashboardController < ::ScopeController
   before_filter :check_terms_of_use, except: %i[accept_terms_of_use terms_of_use]
   # rescope token
   before_filter :rescope_token, except: [:terms_of_use]
+  # user is authenticated -> register api_client for current user
+  before_action :set_user_api_client
+  
   before_filter :raven_context, except: [:terms_of_use]
 
   before_filter :load_user_projects, :set_webcli_endpoint, except: [:terms_of_use]

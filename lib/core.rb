@@ -13,6 +13,11 @@ require_relative 'core/api_client_wrapper'
 require_relative 'core/service_user_api_client_manager'
 
 module Core
+  def self.region_from_auth_url(auth_url = ::Core.keystone_auth_endpoint)
+    data = /.+\.(?<region>[^\.]+)\.cloud\.sap/.match(auth_url)
+    data[:region]
+  end
+  
   def self.locate_region(auth_user,default_region=Rails.configuration.default_region)
     if default_region.nil?
       # default region is nil -> return default region from catalog or nil

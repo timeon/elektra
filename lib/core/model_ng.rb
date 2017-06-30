@@ -81,7 +81,7 @@ module Core
       before_save
 
       success = valid?
-
+byebug
       if success
         success = id.nil? ? create : update
       end
