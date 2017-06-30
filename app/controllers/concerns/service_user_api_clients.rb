@@ -28,8 +28,8 @@ module ServiceUserApiClients
         end
 
       # register domain_admin api client for current scope domain
-      register_domain_admin_api_client(
-        Core::ServiceUserApiClientManager.domain_admin_api_client(scope_domain)
+      register_service_user_api_client(
+        Core::ServiceUserApiClientManager.service_user_api_client(scope_domain)
       )
       # register cloud_admin api_client
       register_cloud_admin_api_client(

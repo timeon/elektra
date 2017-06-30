@@ -5,7 +5,7 @@ module Core
   # The client is created for each domain (organization) and
   # stored in class variable.
   class ServiceUserApiClientManager
-    @domain_admin_api_client_mutex = Mutex.new
+    @service_user_api_client_mutex = Mutex.new
     @cloud_admin_api_client_mutex = Mutex.new
 
     def self.region_from_auth_url(auth_url = ::Core.keystone_auth_endpoint)
@@ -13,20 +13,20 @@ module Core
       data[:region]
     end
 
-    def self.domain_admin_api_client(scope_domain)
+    def self.service_user_api_client(scope_domain)
       return nil if scope_domain.nil?
 
-      @domain_admin_api_client_mutex.synchronize do
-        @domain_admin_api_clients ||= {}
+      @service_user_api_client_mutex.synchronize do
+        @service_user_api_clients ||= {}
 
         # the service user clients are created per domain (organization)
         # and are stored in class variable
-        unless @domain_admin_api_clients[scope_domain]
-          @domain_admin_api_clients[scope_domain] =
-            create_domain_admin_api_client(scope_domain)
+        unless @service_user_api_clients[scope_domain]
+          @service_user_api_clients[scope_domain] =
+            create_service_user_api_client(scope_domain)
         end
       end
-      @domain_admin_api_clients[scope_domain]
+      @service_user_api_clients[scope_domain]
     end
 
     def self.cloud_admin_api_client
@@ -38,7 +38,7 @@ module Core
       @cloud_admin_api_client
     end
 
-    def self.create_domain_admin_api_client(scope_domain)
+    def self.create_service_user_api_client(scope_domain)
       misty_params = {
         auth: {
           url:            ::Core.keystone_auth_endpoint,

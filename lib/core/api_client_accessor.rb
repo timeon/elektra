@@ -64,7 +64,7 @@ module Core
       end
 
       # register domain admin client
-      def register_domain_admin_api_client(api_client)
+      def register_service_user_api_client(api_client)
         ApiClientAccessor.register_api_client('domain_admin', api_client)
       end
 
@@ -79,14 +79,16 @@ module Core
           ApiClientAccessor.api_client('default')
       end
 
-      # executes block in domain admn context
-      def domain_admin(&block)
-        ApiClientAccessor.switch_api_client('domain_admin', &block)
-      end
-
-      # executes block in cloud admin context
-      def cloud_admin(&block)
-        ApiClientAccessor.switch_api_client('cloud_admin', &block)
+      # this method switches the api_client to service user
+      # Usage: service_user {...} or service_user :as_cloud_admin {...}
+      # TODO: rename: remove _ng
+      def service_user_ng(role = :as_domain_admin, &block)
+        case role
+        when :as_cloud_admin
+          ApiClientAccessor.switch_api_client('cloud_admin', &block)
+        else
+          ApiClientAccessor.switch_api_client('domain_admin', &block)
+        end
       end
     end
 

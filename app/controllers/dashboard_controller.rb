@@ -49,7 +49,7 @@ class DashboardController < ::ScopeController
   before_filter :rescope_token, except: [:terms_of_use]
   # user is authenticated -> register api_client for current user
   before_action :set_user_api_client
-  
+
   before_filter :raven_context, except: [:terms_of_use]
 
   before_filter :load_user_projects, :set_webcli_endpoint, except: [:terms_of_use]
@@ -114,7 +114,7 @@ class DashboardController < ::ScopeController
   ]
 
   def rescope_token
-    role_assignments = domain_admin do
+    role_assignments = service_user_ng do
       Identity::RoleAssignmentNg.all('user.id' => current_user.id,
                                      'scope.domain.id' => @scoped_domain_id,
                                      'effective' => true)
@@ -254,7 +254,7 @@ class DashboardController < ::ScopeController
     # get all projects for user (this might be expensive,
     # might need caching, ajaxifying, ...)
     @user_domain_projects ||= begin
-      domain_admin do
+      service_user_ng do
         Identity::ProjectNg.user_projects(
           current_user.id, domain_id: @scoped_domain_id
         ).sort_by(&:name)

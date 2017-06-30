@@ -79,26 +79,26 @@ module ServiceLayer
       driver.map_to(Identity::Project).user_projects(user_id)
     end
 
-    def auth_projects(domain_id=nil)
-      # caching
-      @auth_projects ||= driver.map_to(Identity::Project).auth_projects
-
-      return @auth_projects if domain_id.nil?
-      @auth_projects.select { |project| project.domain_id==domain_id }
-    end
-
-    def auth_projects_tree(projects=auth_projects)
-      if projects && !projects.first.kind_of?(Identity::Project)
-        projects.collect! { |project| ::Identity::Project.new(@driver, project.attributes.merge(id:project.id)) }
-      end
-      @projects_tree ||= Rails.cache.fetch("#{current_user.token}/auth_projects_tree", expires_in: 60.seconds) do
-        Identity::ProjectTree.new(projects)
-      end
-    end
-
-    def clear_auth_projects_tree_cache
-      Rails.cache.delete("#{current_user.token}/auth_projects_tree")
-    end
+    # def auth_projects(domain_id=nil)
+    #   # caching
+    #   @auth_projects ||= driver.map_to(Identity::Project).auth_projects
+    #
+    #   return @auth_projects if domain_id.nil?
+    #   @auth_projects.select { |project| project.domain_id==domain_id }
+    # end
+    #
+    # def auth_projects_tree(projects=auth_projects)
+    #   if projects && !projects.first.kind_of?(Identity::Project)
+    #     projects.collect! { |project| ::Identity::Project.new(@driver, project.attributes.merge(id:project.id)) }
+    #   end
+    #   @projects_tree ||= Rails.cache.fetch("#{current_user.token}/auth_projects_tree", expires_in: 60.seconds) do
+    #     Identity::ProjectTree.new(projects)
+    #   end
+    # end
+    #
+    # def clear_auth_projects_tree_cache
+    #   Rails.cache.delete("#{current_user.token}/auth_projects_tree")
+    # end
 
     def projects(filter={})
       driver.map_to(Identity::Project).projects(filter)

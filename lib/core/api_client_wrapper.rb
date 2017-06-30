@@ -37,6 +37,13 @@ module Core
           @origin_response = response
         end
 
+        def data
+          key = @origin_response.body.keys.reject do |k|
+            %w[links previous next].include?(k)
+          end.first
+          @origin_response.body[key]
+        end
+
         # This method is used to map raw data to a Object.
         def map_to(klazz_or_map, options = {})
           klazz, data = self.class.extract_class_and_data(klazz_or_map,
@@ -67,7 +74,7 @@ module Core
       # Check for response errors
       def handle_response
         response = yield
-        raise ::Core::ApiError, response unless response.is_a?(Net::HTTPOK)
+        raise ::Core::ApiError, response if response.code.to_i >= 400
         Response.new(response)
       end
     end

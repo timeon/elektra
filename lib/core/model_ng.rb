@@ -5,6 +5,7 @@ require_relative 'strip_attributes'
 module Core
   # This class implements the basic functionality for api models.
   # The API response is mapped to a subclass of this class.
+  # TODO: rename: remove _ng
   class ModelNG
     extend ActiveModel::Naming
     extend ActiveModel::Translation
@@ -17,7 +18,8 @@ module Core
 
     strip_attributes
 
-    attr_reader :errors, :id
+    attr_reader :errors
+    attr_accessor :id
 
     def initialize(params = nil)
       self.attributes = params
@@ -52,7 +54,7 @@ module Core
       attribute_name = method_sym.to_s
       if attribute_name.ends_with?('=')
         attribute_name = attribute_name.chop
-        write(attribute_name, arguments)
+        write(attribute_name, arguments.first)
       elsif attribute_name.length > 2
         read(attribute_name)
       else
@@ -76,23 +78,56 @@ module Core
       end
     end
 
+    def attributes_for_save(names = [])
+      names.each_with_object({}) do |name, hash|
+        value = @attributes[name.to_sym] || @attributes[name.to_s]
+        hash[name.to_s] = value if value
+      end
+    end
+
     def save
       # execute before callback
       before_save
 
       success = valid?
-byebug
+
       if success
-        success = id.nil? ? create : update
+        success = id.nil? ? perform_save(:create) : perform_save(:update)
       end
 
       success & after_save
     end
 
+    def update(attributes = {})
+      attributes.each { |key, value| send("#{key}=", value) }
+      save
+    end
+
+    def perform_save(mod)
+      rescue_api_errors do
+        new_attributes = if mod == :create
+                           perform_create
+                         elsif mod == :update
+                           perform_update
+                         end
+        if new_attributes.is_a?(::Core::ApiClientWrapper::Service::Response)
+          new_attributes = new_attributes.data
+        end
+
+        self.attributes = new_attributes
+      end
+    end
+
+    def destroy
+      rescue_api_errors { perform_destroy }
+    end
+
     def rescue_api_errors
       yield
+      true
     rescue ::Core::ApiError => e
       e.messages.each { |m| errors.add('api', m) }
+      false
     end
 
     def attributes=(new_attributes)
@@ -139,14 +174,6 @@ byebug
 
     def pretty_updated_at
       Core::Formatter.format_modification_time(updated_at) if updated_at
-    end
-
-    def attributes_for_create
-      @attributes
-    end
-
-    def attributes_for_update
-      @attributes
     end
 
     def write(attribute_name, value)

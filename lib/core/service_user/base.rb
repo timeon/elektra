@@ -268,82 +268,82 @@ module Core
         driver_method(:group_user_check, false, user_id, group.id) rescue false
       end
 
-      # A special case of list_scope_admins that returns a list of CC admins.
-      def list_ccadmins
-        domain_name = Rails.configuration.cloud_admin_domain
-        in_domain_scope(domain_name) do
-          domain_id = @auth_users[domain_name].domain_id
-          list_scope_admins(domain_id: domain_id)
-        end
-      end
-
-      def list_scope_resource_admins(scope={})
-        role = self.find_role_by_name('resource_admin') rescue nil
-        list_scope_assigned_users(scope.merge(role: role))
-      end
-
-      # Returns admins for the given scope (e.g. project_id: PROJECT_ID, domain_id: DOMAIN_ID)
-      # This method looks recursively for project, parent_projects and domain admins until it finds at least one.
-      # It should always return a non empty list (at least the domain admins).
-      def list_scope_admins(scope={})
-        role = self.find_role_by_name('admin') rescue nil
-        list_scope_assigned_users(scope.merge(role: role))
-      end
-
-      def list_scope_assigned_users!(options={})
-        list_scope_assigned_users(options.merge(raise_error: true))
-      end
-
-      # Returns assigned users for the given scope and role (e.g. project_id: PROJECT_ID, domain_id: DOMAIN_ID, role: ROLE)
-      # This method looks recursively for assigned users of project, parent_projects and domain.
-      def list_scope_assigned_users(options={})
-        admins = []
-        project_id = options[:project_id]
-        domain_id = options[:domain_id]
-        role = options[:role]
-        raise_error = options[:raise_error]
-        
-        # do nothing if role is nil
-        return admins if role.nil?
-
-        begin
-
-          if project_id # project_id is presented
-            # get role_assignments for this project_id
-            role_assignments = self.role_assignments("scope.project.id" => project_id, "role.id" => role.id, effective: true, include_subtree: true) #rescue []
-
-            # load users (not very performant but there is no other option to get users by ids)
-            role_assignments.each do |r|
-              unless r.user["id"] == self.id
-                admin = self.find_user(r.user["id"]) rescue nil
-                admins << admin if admin
-              end
-            end
-            if admins.length==0 # no admins for this project_id found
-              # load project
-              project = self.find_project(project_id) rescue nil
-              if project
-                # try to get admins recursively by parent_id
-                admins = list_scope_assigned_users(project_id: project.parent_id, domain_id: project.domain_id, role: role)
-              end
-            end
-          elsif domain_id # project_id is nil but domain_id is presented
-            # get role_assignments for this domain_id
-            role_assignments = self.role_assignments("scope.domain.id" => domain_id, "role.id" => role.id, effective: true) #rescue []
-            # load users
-            role_assignments.each do |r|
-              unless r.user["id"] == self.id
-                admin = self.find_user(r.user["id"]) rescue nil
-                admins << admin if admin
-              end
-            end
-          end
-        rescue => e
-          raise e if raise_error
-        end
-
-        return admins.delete_if { |a| a.id == nil } # delete crap
-      end
+      # # A special case of list_scope_admins that returns a list of CC admins.
+      # def list_ccadmins
+      #   domain_name = Rails.configuration.cloud_admin_domain
+      #   in_domain_scope(domain_name) do
+      #     domain_id = @auth_users[domain_name].domain_id
+      #     list_scope_admins(domain_id: domain_id)
+      #   end
+      # end
+      #
+      # def list_scope_resource_admins(scope={})
+      #   role = self.find_role_by_name('resource_admin') rescue nil
+      #   list_scope_assigned_users(scope.merge(role: role))
+      # end
+      #
+      # # Returns admins for the given scope (e.g. project_id: PROJECT_ID, domain_id: DOMAIN_ID)
+      # # This method looks recursively for project, parent_projects and domain admins until it finds at least one.
+      # # It should always return a non empty list (at least the domain admins).
+      # def list_scope_admins(scope={})
+      #   role = self.find_role_by_name('admin') rescue nil
+      #   list_scope_assigned_users(scope.merge(role: role))
+      # end
+      #
+      # def list_scope_assigned_users!(options={})
+      #   list_scope_assigned_users(options.merge(raise_error: true))
+      # end
+      #
+      # # Returns assigned users for the given scope and role (e.g. project_id: PROJECT_ID, domain_id: DOMAIN_ID, role: ROLE)
+      # # This method looks recursively for assigned users of project, parent_projects and domain.
+      # def list_scope_assigned_users(options={})
+      #   admins = []
+      #   project_id = options[:project_id]
+      #   domain_id = options[:domain_id]
+      #   role = options[:role]
+      #   raise_error = options[:raise_error]
+      #
+      #   # do nothing if role is nil
+      #   return admins if role.nil?
+      #
+      #   begin
+      #
+      #     if project_id # project_id is presented
+      #       # get role_assignments for this project_id
+      #       role_assignments = self.role_assignments("scope.project.id" => project_id, "role.id" => role.id, effective: true, include_subtree: true) #rescue []
+      #
+      #       # load users (not very performant but there is no other option to get users by ids)
+      #       role_assignments.each do |r|
+      #         unless r.user["id"] == self.id
+      #           admin = self.find_user(r.user["id"]) rescue nil
+      #           admins << admin if admin
+      #         end
+      #       end
+      #       if admins.length==0 # no admins for this project_id found
+      #         # load project
+      #         project = self.find_project(project_id) rescue nil
+      #         if project
+      #           # try to get admins recursively by parent_id
+      #           admins = list_scope_assigned_users(project_id: project.parent_id, domain_id: project.domain_id, role: role)
+      #         end
+      #       end
+      #     elsif domain_id # project_id is nil but domain_id is presented
+      #       # get role_assignments for this domain_id
+      #       role_assignments = self.role_assignments("scope.domain.id" => domain_id, "role.id" => role.id, effective: true) #rescue []
+      #       # load users
+      #       role_assignments.each do |r|
+      #         unless r.user["id"] == self.id
+      #           admin = self.find_user(r.user["id"]) rescue nil
+      #           admins << admin if admin
+      #         end
+      #       end
+      #     end
+      #   rescue => e
+      #     raise e if raise_error
+      #   end
+      #
+      #   return admins.delete_if { |a| a.id == nil } # delete crap
+      # end
     end
   end
 end

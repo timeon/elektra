@@ -30,5 +30,41 @@ module Identity
         array
       end
     end
+
+    def self.grant_project_user_role_by_role_name(project_id, user_id, role_name)
+      role = Identity::RoleNg.find_by_name(role_name)
+      grant_project_user_role(project_id, user_id, role.id)
+    end
+
+    def self.grant_project_user_role(project_id, user_id, role_id)
+      api.identity.assign_role_to_user_on_project(project_id, user_id, role_id)
+    end
+
+    def self.revoke_project_user_role(project_id, user_id, role_id)
+      api.identity.unassign_role_from_user_on_project(
+        project_id, user_id, role_id
+      )
+    end
+
+    def self.grant_project_group_role(project_id, group_id, role_id)
+      api.identity.assign_role_to_group_on_project(pro, group_id, role_id)
+    end
+
+    def self.revoke_project_group_role(project_id, group_id, role_id)
+      api.identity.unassign_role_from_group_on_project(
+        project_id, group_id, role_id
+      )
+    end
+
+    def self.grant_domain_user_role(domain_id, user_id, role_id)
+      api.identity.assign_role_to_user_on_domain(domain_id, user_id, role_id)
+    end
+
+    def self.revoke_domain_user_role(domain_id, user_id, role_id)
+      api.identity.unassigns_role_from_user_on_domain(
+        domain_id, user_id, role_id
+      )
+    end
+
   end
 end

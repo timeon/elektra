@@ -1,4 +1,4 @@
-module ViewHelper  
+module ViewHelper
   def project_name(id)
     # try to find project in friendly ids
     remote_project = FriendlyIdEntry.find_by_class_scope_and_key_or_slug('Project',@scoped_domain_id,id)
@@ -42,7 +42,7 @@ module ViewHelper
     if domain
       # try to find domain in friendly ids
       remote_domain = FriendlyIdEntry.find_by_class_scope_and_key_or_slug('Domain', nil, domain)
-      remote_domain = @service_user.find_domain(domain) unless remote_domain
+      remote_domain = service_user_ng { Identity::DomainNg.find(domain) } unless remote_domain
       # domains where the service user does not have permissions or deleted domains get 'N/A'
       domain_name = remote_domain ? remote_domain.name : ''
       # "#{domain} (#{domain_name})"

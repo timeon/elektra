@@ -3,36 +3,41 @@ module Identity
     # This controller implemnts the workflow to create a project request
     class RequestWizardController < ::DashboardController
       before_filter do
-        enforce_permissions("identity:project_request",{domain_id: @scoped_domain_id})
+        enforce_permissions('identity:project_request',
+                            domain_id: @scoped_domain_id)
       end
 
       def new
-        @project = Identity::Project.new(nil,{})
-        @project.enabled = true
-        @project.parent_id = @scoped_project_id #params[:parent_project_id] if params[:parent_project_id]
-        @project.parent_name = @scoped_project_name #params[:parent_project_name] if params[:parent_project_name]
-        @project.cost_control = {}
+        @project = Identity::ProjectNg.new(
+          enabled:  true,
+          parent_id:  @scoped_project_id,
+          parent_name: @scoped_project_name,
+          cost_control: {}
+        )
 
-        if services.available?(:cost_control)
-          @cost_control_masterdata = services.cost_control.new_project_masterdata
-        end
+        return unless services.available?(:cost_control)
+        @cost_control_masterdata = services.cost_control.new_project_masterdata
       end
 
       def create
-        @project = Identity::Project.new(nil,{})
-        @project.attributes=params.fetch(:project, {}).merge(domain_id: @scoped_domain_id)
-
-        inquiry = nil
+        project_params = params.fetch(:project_ng, {})
+                               .merge(domain_id: @scoped_domain_id)
+        @project = Identity::ProjectNg.new(project_params)
 
         if @project.valid?
+          resource_admins = service_user_ng do
+            Identity::UserNg.list_scope_resource_admins(
+              domain_id: @scoped_domain_id
+            )
+          end
+
           begin
             inquiry = services.inquiry.create_inquiry(
                 'project',
                 "#{@project.name} - #{@project.description}",
                 current_user,
                 @project.attributes.to_json,
-                service_user.list_scope_resource_admins(domain_id: @scoped_domain_id),
-                #service_user.list_scope_admins(domain_id: @scoped_domain_id),
+                resource_admins,
                 {
                     "approved": {
                         "name": "Approve",
