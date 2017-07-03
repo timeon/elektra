@@ -8,7 +8,7 @@ module Core
 
     # stores all available api clients.
     def self.api_client_registry
-      RequestStore.store[:api_clients] ||= {}
+      RequestStore.store[:api_client_registry] ||= {}
     end
 
     # register a new client by name
@@ -18,12 +18,12 @@ module Core
 
     # returns currently active client
     def self.current_api_client
-      RequestStore.store[:api_client]
+      RequestStore.store[:current_api_client]
     end
 
     # sets active api client
     def self.current_api_client=(api_client)
-      RequestStore.store[:api_client] = api_client
+      RequestStore.store[:current_api_client] = api_client
     end
 
     # returns client by name
