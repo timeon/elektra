@@ -66,8 +66,8 @@ gem 'arc-client', git: 'https://github.com/sapcc/arc-client.git'
 # gem 'therubyracer', platforms: :ruby
 
 # openstack api client
-# gem 'misty', git: 'https://github.com/sapcc/misty.git', branch: :master
-gem 'misty', git: 'https://github.com/flystack/misty.git', branch: :master
+gem 'misty', git: 'https://github.com/sapcc/misty.git', branch: :"fix-project_domain"
+#gem 'misty', git: 'https://github.com/flystack/misty.git', branch: :master
 
 # Limes
 gem 'misty-limes', git: 'https://github.com/sapcc/misty-limes.git'
