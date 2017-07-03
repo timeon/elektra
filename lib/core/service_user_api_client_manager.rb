@@ -48,6 +48,7 @@ module Core
           domain:         scope_domain
         },
         identity: { base_path: '/' },
+        ssl_verify_mode: Rails.configuration.ssl_verify_peer,
         region_id: Rails.application.config.default_region ||
                    region_from_auth_url
       }
@@ -74,6 +75,7 @@ module Core
           project_domain: Rails.configuration.cloud_admin_domain
         },
         identity: { base_path: '/' },
+        ssl_verify_mode: Rails.configuration.ssl_verify_peer,
         log_level: Logger::INFO,
         region_id: Rails.application.config.default_region ||
                    region_from_auth_url
