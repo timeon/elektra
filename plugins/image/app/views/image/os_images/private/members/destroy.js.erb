@@ -1,5 +1,7 @@
-<% if @success %>
-  $("#member_<%=params[:id]%>").remove();
-<% else %>
+<% if @member.errors.size.positive? %>
+  $('#members .form-wrapper .error').text('<%=@member.errors.full_messages.to_sentence%>');
   $("#member_<%=params[:id]%>").removeClass('updating');
-<% end %>  
+<% else %>
+  $('#members .form-wrapper .error').text('');
+  $("#member_<%=params[:id]%>").remove();
+<% end %>

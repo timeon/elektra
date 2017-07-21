@@ -1,14 +1,14 @@
 Image::Engine.routes.draw do
   namespace :os_images do
-    resources :public do
+    resources :public, only: %i[index show destroy] do
       put :unpublish
     end
-    
-    resources :private do
+
+    resources :private, only: %i[index show destroy] do
       put :publish
-      resources :members, module: :private, except: [:edit, :update, :show]
+      resources :members, module: :private, except: %i[edit update show]
     end
-    resources :suggested do
+    resources :suggested, only: %i[index show destroy] do
       put :accept
       put :reject
     end

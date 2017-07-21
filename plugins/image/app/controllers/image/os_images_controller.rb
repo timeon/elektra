@@ -1,10 +1,11 @@
-module Image
-  class OsImagesController < Image::ApplicationController
-    # before_filter :load_visibility, only: [:index, :show]
+# frozen_string_literal: true
 
+module Image
+  # Implements Image actions
+  class OsImagesController < ::Image::ApplicationController
     def index
       @images = paginatable(per_page: 15) do |pagination_options|
-        services.image.images(filter_params.merge(pagination_options))
+        services_ng.image.images(filter_params.merge(pagination_options))
       end
 
       # this is relevant in case an ajax paginate call is made.
@@ -18,7 +19,7 @@ module Image
     end
 
     def show
-      @image = services.image.find_image(params[:id])
+      @image = services_ng.image.find_image(params[:id])
 
       properties = @image.attributes.clone.stringify_keys
       known_attributes = %w[
@@ -32,20 +33,9 @@ module Image
       @properties = properties.sort_by { |k, _v| k }
     end
 
-    def new; end
-
-    def create
-      render text: 'create'
-    end
-
-    def edit; end
-
-    def update
-      render text: 'update'
-    end
-
     def destroy
-      @image = services.image.find_image(params[:id])
+      @image = services_ng.image.new_image
+      @image.id = params[:id]
       @success = (@image && @image.destroy)
     end
 

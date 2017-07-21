@@ -95,6 +95,7 @@ class @MoModal
     return false
 
   showError= (jqXHR, textStatus, errorThrown) ->
+    console.log(jqXHR, textStatus, errorThrown)
     # console.log("jqXHR",jqXHR)
     # console.log("textStatus",textStatus)
     # console.log("errorThrown",errorThrown)

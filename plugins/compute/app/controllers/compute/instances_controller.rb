@@ -72,7 +72,7 @@ module Compute
       @instance = services_ng.compute.new_server
 
       @flavors            = services_ng.compute.flavors
-      @images             = services.image.all_images
+      @images             = services_ng.image.all_images
 
       azs = services_ng.compute.availability_zones
       if azs
@@ -127,7 +127,7 @@ module Compute
         render template: 'compute/instances/create.js'
       else
         @flavors = services_ng.compute.flavors
-        @images = services.image.images
+        @images = services_ng.image.images
         @availability_zones = services_ng.compute.availability_zones
         @security_groups = services_ng.networking.security_groups(
           tenant_id: @scoped_project_id
